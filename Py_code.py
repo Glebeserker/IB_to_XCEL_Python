@@ -20,39 +20,62 @@ import time
 #writer.save()
 
 #setting IBAPI class object constructor method in order to call up for data and saving it in dictionary
+data_dictionary = {'Last Price': 0,
+                   'Ask Price': 0,
+                   'Bid Price': 0,
+                   'Bid Size': 0,
+                   'Ask Size' : 0,
+                   'Volume' : 0,
+                   'Last Size': 0} #dictionary to save price based on Id
 class IBapi(EWrapper, EClient):
     def __init__(self):
         EClient.__init__(self, self)
-        self.reqId_EUR_USD_dictionary = {'bidSize': None, 'askPrice': None, 'bidPrice': None,  } #dictionary to save price based on Id
+	#pulling price data from TWS(delayed)
     def tickPrice(self, reqId, tickType, price, attrib):
+        #opening file so can be written
+        file = open('price.txt', 'w')
+        
         if tickType == 67 and reqId == 1:
             print('The current ask price is: ', price)
-            #converting price to string to be saved in .txt file to be sent to excel
-            text_price = str(price)
+            text_ask = str(price)
+            data_dictionary['Ask Price'] = text_ask
     
         elif tickType == 68 and reqId == 1:
             print('Last price was: ', price)
             text_lastPrice = str(price)
+            data_dictionary['Last Price'] = text_lastPrice
 
         elif tickType == 66 and reqId == 1:
             print('The current bid price is: ', price)
-            text_bid = str(price)
-            
-# Function to recieve size data(delayed)
+            text_bidPrice = str(price)
+            data_dictionary['Bid Price'] = text_bidPrice
+        
+        print(data_dictionary)
+        file.write(str(data_dictionary))
+        file.close
+        
+    #function to pull size requests from TWS(delayed)    
     def tickSize(self, reqId, tickType, size):
+        file = open('price.txt', 'w')
+        
         if tickType == 69 and reqId == 1:
             print("The bid size is:", size)
             text_bidSize = str(size)
+            data_dictionary['Bid Size'] = text_bidSize
+            
         elif tickType == 70 and reqId == 1:
             print("The ask size is: ", size)
             text_askSize = str(size)
+            data_dictionary['Ask Size'] = text_askSize
         elif tickType == 74 and reqId == 1:
             print("The Volume is: ", size)
             text_volume = str(size)
+            data_dictionary['Volume'] = text_volume
         elif tickType == 71 and reqId == 1:
             print("Last size was: ", size)
             text_lastSize = str(size)
-
+            data_dictionary['Last Size'] = text_lastSize
+            
         
 
 def run_loop():
@@ -95,6 +118,7 @@ app.reqMarketDataType(3)
 # Requesting Market Data for Euro to Usd ask price 1 = unique identifier, contract info, string for genericTickList (https://interactivebrokers.github.io/tws-api/classIBApi_1_1EClient.html#a7a19258a3a2087c07c1c57b93f659b63)
 # boolean value if want a one-time snap shot, boolean value for regulatory snapshot, [] = mktDataOptions TagValue.
 app.reqMktData(1, vixFuture_contract, '', False, False, [])
+#app.reqMktData(1, eurusd_contract, '', False, False, [])
 
 
 time.sleep(1) #Sleep interval to allow time for incoming price data
