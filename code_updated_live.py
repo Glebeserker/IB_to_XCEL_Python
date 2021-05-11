@@ -84,7 +84,7 @@ def run_loop():
 	app.run()
 # calling up IBAPI class instance and connecting the app to local host server
 app = IBapi()
-app.connect('127.0.0.1', 7497, 135)
+app.connect('127.0.0.1', 7496, 135)
 
 #Start the socket in a thread
 api_thread = threading.Thread(target=run_loop, daemon=True)
