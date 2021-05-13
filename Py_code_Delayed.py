@@ -4,12 +4,14 @@
 # Replacing python3 in command line with just python
 
 #importing IBAPI pythonclient components for application
+from os import write
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
-#threading and time to control the process of the app
+#threading and time to control the process of the app and csv to write csv files
 import threading
 import time
+import csv
 # imported pandas in order to convert dictionary of price to panda and eventually to excel(in progress)
 #import pandas as pd
 
@@ -19,64 +21,236 @@ import time
 #main_df.to_excel(writer, sheet_name='Sheet1', index=False)
 #writer.save()
 
-#setting IBAPI class object constructor method in order to call up for data and saving it in dictionary
-data_dictionary = {'Last Price': 0,
-                   'Ask Price': 0,
-                   'Bid Price': 0,
-                   'Bid Size': 0,
-                   'Ask Size' : 0,
-                   'Volume' : 0,
-                   'Last Size': 0} #dictionary to save price based on Id
+#creating multiple dictionaries for each month, to be latter added to a list and saved as cvs file
+may_data_dictionary = {'Date': 20210519,
+                       'Bid Size': 0,
+                       'Bid Price': 0,
+                       'Ask Size': 0,
+                       'Ask Price': 0,
+                       'Last Price': 0,
+                       'Volume': 0}
+
+june_data_dictionary = {'Date': 20210616,
+                        'Bid Size': 0,
+                        'Bid Price': 0,
+                        'Ask Size': 0,
+                        'Ask Price': 0,
+                        'Last Price': 0,
+                        'Volume': 0}
+
+july_data_dictionary = {'Date': 20210721,
+                        'Bid Size': 0,
+                        'Bid Price': 0,
+                        'Ask Size': 0,
+                        'Ask Price': 0,
+                        'Last Price': 0,
+                        'Volume': 0}
+
+august_data_dictionary = {'Date': 20210818,
+                          'Bid Size': 0,
+                          'Bid Price': 0,
+                          'Ask Size': 0,
+                          'Ask Price': 0,
+                          'Last Price': 0,
+                          'Volume': 0}
+
+september_data_dictionary = {'Date': 20210915,
+                             'Bid Size': 0,
+                             'Bid Price': 0,
+                             'Ask Size': 0,
+                             'Ask Price': 0,
+                             'Last Price': 0,
+                             'Volume': 0}
+
+#List to put dictionaries into
+dicts = [may_data_dictionary, june_data_dictionary, july_data_dictionary, august_data_dictionary, september_data_dictionary] 
+
+#IB constructor class to send and recieve data
 class IBapi(EWrapper, EClient):
     def __init__(self):
         EClient.__init__(self, self)
-	#pulling price data from TWS(delayed)
     def tickPrice(self, reqId, tickType, price, attrib):
-        #opening file so can be written
-        file = open('price.txt', 'w')
         
-        if tickType == 67 and reqId == 1:
-            print('The current ask price is: ', price)
-            text_ask = str(price)
-            data_dictionary['Ask Price'] = text_ask
+        
+        # ask price if statement for each month
+        if tickType == 67: 
+            if reqId == 1:
+                print('May ask price is: ', price)
+                text_ask = str(price)
+                may_data_dictionary['Ask Price'] = text_ask
+            elif reqId == 2:
+                print('June ask price is: ', price)
+                text_ask = str(price)
+                june_data_dictionary['Ask Price'] = text_ask
+            elif reqId == 3:
+                print('July ask price is: ', price)
+                text_ask = str(price)
+                july_data_dictionary['Ask Price'] = text_ask
+            elif reqId == 4: 
+                print('August ask price is: ', price)
+                text_ask = str(price)
+                august_data_dictionary['Ask Price'] = text_ask
+            elif reqId == 5:
+                print('Septemeber ask price is: ', price)
+                text_ask = str(price)
+                september_data_dictionary['Ask Price'] = text_ask
+            else: 
+                print('Incorrect reqId') 
     
-        elif tickType == 68 and reqId == 1:
-            print('Last price was: ', price)
-            text_lastPrice = str(price)
-            data_dictionary['Last Price'] = text_lastPrice
+        elif tickType == 68: 
+            if reqId == 1:
+                print('May last price was: ', price)
+                text_lastPrice = str(price)
+                may_data_dictionary['Last Price'] = text_lastPrice
+            elif reqId == 2:
+                print('June last price was: ', price)
+                text_lastPrice = str(price)
+                june_data_dictionary['Last Price'] = text_lastPrice
+            elif reqId == 3:
+                print('July last price was: ', price)
+                text_lastPrice = str(price)
+                july_data_dictionary['Last Price'] = text_lastPrice
+            elif reqId == 4:
+                print('August last price was: ', price)
+                text_lastPrice = str(price)
+                august_data_dictionary['Last Price'] = text_lastPrice
+            elif reqId == 5:
+                print('Septemeber last price was: ', price)
+                text_lastPrice = str(price)
+                september_data_dictionary['Last Price'] = text_lastPrice
+            else:
+                print('Incorrect reqId')
+                
 
-        elif tickType == 66 and reqId == 1:
-            print('The current bid price is: ', price)
-            text_bidPrice = str(price)
-            data_dictionary['Bid Price'] = text_bidPrice
+        elif tickType == 66: 
+            if reqId == 1:
+                print('May bid price is: ', price)
+                text_bidPrice = str(price)
+                may_data_dictionary['Bid Price'] = text_bidPrice
+            elif reqId == 2:
+                print('June bid price is: ', price)
+                text_bidPrice = str(price)
+                june_data_dictionary['Bid Price'] = text_bidPrice
+            elif reqId == 3:
+                print('July bid price is: ', price)
+                text_bidPrice = str(price)
+                july_data_dictionary['Bid Price'] = text_bidPrice
+            elif reqId == 4:
+                print('August bid price is: ', price)
+                text_bidPrice = str(price)
+                august_data_dictionary['Bid Price'] = text_bidPrice
+            elif reqId == 5:
+                print('September bid price is: ', price)
+                text_bidPrice = str(price)
+                september_data_dictionary['Bid Price'] = text_bidPrice
+            else:
+                print('Incorrect reqId')
         
-        print(data_dictionary)
-        file.write(str(data_dictionary))
-        file.close
         
-    #function to pull size requests from TWS(delayed)    
+        
+    # function to call size parameters of things
     def tickSize(self, reqId, tickType, size):
-        file = open('price.txt', 'w')
         
-        if tickType == 69 and reqId == 1:
-            print("The bid size is:", size)
-            text_bidSize = str(size)
-            data_dictionary['Bid Size'] = text_bidSize
+        if tickType == 69: 
+            if reqId == 1:
+                print("May bid size is:", size)
+                text_bidSize = str(size)
+                may_data_dictionary['Bid Size'] = text_bidSize
+            elif reqId == 2:
+                print("June bid size is: ",size)
+                text_bidSize = str(size)
+                june_data_dictionary['Bid Size'] = text_bidSize
+            elif reqId == 3:
+                print('July bid size is: ', size)
+                text_bidSize = str(size)
+                july_data_dictionary['Bid Size'] = text_bidSize
+            elif reqId == 4:
+                print('August bid size is: ', size)
+                text_bidSize = str(size)
+                august_data_dictionary['Bid Size'] = text_bidSize
+            elif reqId == 5:
+                print('Septmeber bid size is: ', size)
+                text_bidSize = str(size)
+                september_data_dictionary['Bid Size'] = text_bidSize
+            else: 
+                print('Incorrect reqId')
+                
             
-        elif tickType == 70 and reqId == 1:
-            print("The ask size is: ", size)
-            text_askSize = str(size)
-            data_dictionary['Ask Size'] = text_askSize
-        elif tickType == 74 and reqId == 1:
-            print("The Volume is: ", size)
-            text_volume = str(size)
-            data_dictionary['Volume'] = text_volume
-        elif tickType == 71 and reqId == 1:
-            print("Last size was: ", size)
-            text_lastSize = str(size)
-            data_dictionary['Last Size'] = text_lastSize
-            
+        elif tickType == 70:
+            if reqId == 1:
+                print("May ask size is: ", size)
+                text_askSize = str(size)
+                may_data_dictionary['Ask Size'] = text_askSize
+            elif reqId == 2:
+                print('June ask size is: ', size)
+                text_askSize = str(size)
+                june_data_dictionary['Ask Size'] = text_askSize
+            elif reqId == 3:
+                print('July ask size is: ', size)
+                text_askSize = str(size)
+                july_data_dictionary['Ask Size'] = text_askSize 
+            elif reqId == 4:
+                print('August ask size is: ', size)
+                text_askSize = str(size)
+                august_data_dictionary['Ask Size'] = text_askSize 
+            elif reqId == 5:
+                print('September ask size is: ', size)
+                text_askSize = str(size)
+                september_data_dictionary['Ask Size'] = text_askSize
+            else:
+                print('Incorrect reqId')
+                  
+        elif tickType == 74:
+            if reqId == 1:
+                print("May volume is: ", size)
+                text_volume = str(size)
+                may_data_dictionary['Volume'] = text_volume
+            elif reqId == 2:
+                print('June volume is: ', size)
+                text_volume = str(size)
+                june_data_dictionary['Volume'] = text_volume
+            elif reqId == 3:
+                print('July volume is: ', size)
+                text_volume = str(size)
+                july_data_dictionary['Volume'] = text_volume
+            elif reqId == 4:
+                print('August volume is: ', size)
+                text_volume = str(size)
+                august_data_dictionary['Volume'] = text_volume
+            elif reqId == 5:
+                print('Septemeber volume is: ', size)
+                text_volume = str(size)
+                september_data_dictionary['Volume'] = text_volume
+                
+        elif tickType == 71:
+            if reqId == 1:
+                print("May last size was: ", size)
+                text_lastSize = str(size)
+                may_data_dictionary['Last Size'] = text_lastSize
+            elif reqId == 2:
+                print('June last size was: ', size)
+                text_lastSize = str(size)
+                june_data_dictionary['Last Size'] = text_lastSize
+            elif reqId == 3:
+                print('July last size was: ', size)
+                text_lastSize = str(size)
+                july_data_dictionary['Last Size'] = text_lastSize
+            elif reqId == 4:
+                print('August last size was: ', size)
+                text_lastSize = str(size)
+                august_data_dictionary['Last Size'] = text_lastSize
+            elif reqId == 5:
+                print('Septemeber last size was: ', size)
+                text_lastSize = str(size)
+                september_data_dictionary['Last Size'] = text_lastSize
+        data_columns = ['Date', 'Bid Price', 'Bid Size', 'Ask Price', 'Ask Size', 'Last Price', 'Last Size', 'Volume']
+        with open('C:\IB-Script\Data.csv', 'r+') as ofile:
+            writer = csv.DictWriter(ofile, fieldnames=data_columns)
+            writer.writeheader()
+            for data in dicts:
+                writer.writerow(data)
         
+
 
 def run_loop():
 	app.run()
@@ -90,22 +264,50 @@ api_thread.start()
 
 time.sleep(1) #Sleep interval to allow time for connection to server
 
-#Create contract object
-vixFuture_contract = Contract()
-vixFuture_contract.symbol = 'VXK1'
-vixFuture_contract.secType = 'FUT'
-vixFuture_contract.tradingClass = 'VX'
-vixFuture_contract.exchange = 'CFE'
-vixFuture_contract.currency = 'USD'
-vixFuture_contract.lastTradeDateOrContractMonth = '20210519'
+#Create May VIX future object
+may_vixFuture_contract = Contract()
+may_vixFuture_contract.symbol = 'VXK1'
+may_vixFuture_contract.secType = 'FUT'
+may_vixFuture_contract.tradingClass = 'VX'
+may_vixFuture_contract.exchange = 'CFE'
+may_vixFuture_contract.currency = 'USD'
+may_vixFuture_contract.lastTradeDateOrContractMonth = '20210519'
 
+#Create June VIX future object
+june_vixFuture_contract = Contract()
+june_vixFuture_contract.symbol = 'VXK1'
+june_vixFuture_contract.secType = 'FUT'
+june_vixFuture_contract.tradingClass = 'VX'
+june_vixFuture_contract.exchange = 'CFE'
+june_vixFuture_contract.currency = 'USD'
+june_vixFuture_contract.lastTradeDateOrContractMonth = '20210616'
 
-#currency object
-eurusd_contract = Contract()
-eurusd_contract.symbol = 'EUR'
-eurusd_contract.secType = 'CASH'
-eurusd_contract.exchange = 'IDEALPRO'
-eurusd_contract.currency = 'USD'
+#Create July VIX future object
+july_vixFuture_contract = Contract()
+july_vixFuture_contract.symbol = 'VXK1'
+july_vixFuture_contract.secType = 'FUT'
+july_vixFuture_contract.tradingClass = 'VX'
+july_vixFuture_contract.exchange = 'CFE'
+july_vixFuture_contract.currency = 'USD'
+july_vixFuture_contract.lastTradeDateOrContractMonth = '20210721'
+
+#Create August VIX future object
+august_vixFuture_contract = Contract()
+august_vixFuture_contract.symbol = 'VXK1'
+august_vixFuture_contract.secType = 'FUT'
+august_vixFuture_contract.tradingClass = 'VX'
+august_vixFuture_contract.exchange = 'CFE'
+august_vixFuture_contract.currency = 'USD'
+august_vixFuture_contract.lastTradeDateOrContractMonth = '20210818'
+
+#Create Septmeber VIX future object
+september_vixFuture_contract = Contract()
+september_vixFuture_contract.symbol = 'VXK1'
+september_vixFuture_contract.secType = 'FUT'
+september_vixFuture_contract.tradingClass = 'VX'
+september_vixFuture_contract.exchange = 'CFE'
+september_vixFuture_contract.currency = 'USD'
+september_vixFuture_contract.lastTradeDateOrContractMonth = '20210915'
 
 # 1) Live Data
 # 2) Frozen
@@ -117,8 +319,13 @@ app.reqMarketDataType(3)
 
 # Requesting Market Data for Euro to Usd ask price 1 = unique identifier, contract info, string for genericTickList (https://interactivebrokers.github.io/tws-api/classIBApi_1_1EClient.html#a7a19258a3a2087c07c1c57b93f659b63)
 # boolean value if want a one-time snap shot, boolean value for regulatory snapshot, [] = mktDataOptions TagValue.
-app.reqMktData(1, vixFuture_contract, '', False, False, [])
-#app.reqMktData(1, eurusd_contract, '', False, False, [])
+app.reqMktData(1, may_vixFuture_contract, '', False, False, [])
+app.reqMktData(2, june_vixFuture_contract, '', False, False, [])
+app.reqMktData(3, july_vixFuture_contract, '', False, False, [])
+app.reqMktData(4, august_vixFuture_contract, '', False, False, [])
+app.reqMktData(5, september_vixFuture_contract, '', False, False, [])
+
+
 
 
 time.sleep(1) #Sleep interval to allow time for incoming price data
