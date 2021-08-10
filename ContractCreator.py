@@ -33,9 +33,6 @@ print('connection closed')
 #contractList constructor
 contractLists = []
 
-class ContractCreator(object):
-    def __init__(self, date):
-        self.lastTradeDateOrContractMonth = date
 #Clearing the list for each time it is called up so there are no repeated dates        
 contractLists.clear()        
 #Function that creates a Contract
