@@ -1,14 +1,14 @@
 import pyodbc
-from ibapi import contract
+
 from ibapi.contract import Contract
 
 #List to be used for data
 dateList = []
 realList = []
-
+contractLists = []
 #Establishing connection with MS Access Database
 conn_str = (r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
-            r'DBQ=FULL LENGTH TO MS ACCESS FILE HERE;')
+            r'DBQ=C:\FULL PATH TO MS ACCESS FILE HERE;')
 conn = pyodbc.connect(conn_str)
 
 cursor = conn.cursor()
@@ -23,15 +23,13 @@ for row in cursor.fetchall():
     dateList.append(str(row))
     for item in dateList:
         realList.append(item[2:10])
-print('succes')
+
 #Closing connection
 cursor.close()
 conn.close()
 print('connection closed')
 
 
-#contractList constructor
-contractLists = []
 
 #Clearing the list for each time it is called up so there are no repeated dates        
 contractLists.clear()        
@@ -49,4 +47,3 @@ def ContractMaker(date, secType = 'FUT', currency="USD", exchane='CFE', symbol =
 for date in realList:
     contractLists.append(ContractMaker(date))
 
-print(contractLists)
