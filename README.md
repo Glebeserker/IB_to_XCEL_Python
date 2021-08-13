@@ -9,3 +9,4 @@ The folder the script is in must have a MS Access File in which expiration dates
 **Limitation(TEMP)**
 
 Only updates values in the spreadsheet
+Scripts are written for paper accounts tickTypes and MarketType must be updated for live account
