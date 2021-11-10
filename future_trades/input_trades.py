@@ -4,7 +4,7 @@ from ibapi.contract import Contract
 from ibapi.order import Order
 from threading import Timer
 import os, sys
-from contracts import contract_list
+from ../future_data/access_accessed import contractLists, realList
 
 
 
@@ -41,7 +41,7 @@ class TestApp(EWrapper, EClient):
         order.orderType = "LMT"
         order.lmtPrice = priceLimit
 
-        self.placeOrder(self.nextOrderId, contract_list[index_order], order)
+        self.placeOrder(self.nextOrderId, contractLists[index_order], order)
 
     def stop(self):
         self.done = True
