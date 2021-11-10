@@ -1,5 +1,5 @@
 # IB_to_XCEL_Python
-To utilize Interactive Brokers API to send portfolio information onto Excel spreadsheet to make models.
+A collection of scripts written to work along VisualBasic for potential Algo Trading in the future
 
 **ExcelWritter**
 
