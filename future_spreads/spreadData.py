@@ -85,10 +85,7 @@ orient='index')
 
 print(spread_frame)
 
-# connection = pymysql.connect(host='localhost:3306',
-#                              user='root',
-#                              password='Dm5zttia!',
-#                              db='spread_futures')
+
 
 
 spread_frame.to_csv('spread_data.csv', index=True)
